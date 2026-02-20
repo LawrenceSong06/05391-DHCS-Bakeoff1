@@ -83,8 +83,17 @@ function makeSquaresUsingHTMLButtons(trial: Trial) {
 			// Add the square's ID as the text of the button
 			button.innerText = ""+squareID; // the empty string ("") is added to the squareID to convert it from a number (as it is stored in the squareData) to a string (which is what is needed for an innerText property). This is not strictly necessary in plain JavaScript -- JS will do the conversion implicitly -- but TypeScript does care, and I find it helpful to my own understanding/debugging to be careful about this kind of thing.
 
+			button.style.fontSize = "50px"; // make the text bigger, so it's easier to read on the buttons (adjusting for larger button size)
+
 			// style the button to have the square's color as its background color.
-			button.style = "background: "+squareColor+";";
+			button.style.background = squareColor;
+
+			button.style.width = "165px"; // set the button to a standard width and height, for a more standardized game experience.
+			button.style.height = "165px";
+
+			button.style.margin = "5px"; // add some space between the buttons, so they don't look like one big mass of color.
+
+			row.style.display = "flex"; // this makes the buttons in this row line up horizontally instead of vertically.
 
 			// Very important: we need to be able to tell the trial engine when this button has been clicked! Since we are making these as their own HTML elements, we can add a click listener to each. The handler will report the click to the trial engine using the trial.submitClick method. The handler function is being defined in-place (anonymously) right in the addEventListener method call.
 			button.addEventListener("click", () => {
