@@ -1,0 +1,10 @@
+/*Any student-written CSS should go in this file.*/
+.hover-light{
+    transition: box-shadow 100ms;
+}
+.hover-light:hover{
+    box-shadow: inset -.25ex -.25ex .25ex rgba(0, 0, 0, 0.508), inset .25ex .25ex .25ex rgba(255, 255, 255, 0.508);
+}
+.hover-light:active{
+    box-shadow: inset -.25ex -.25ex .25ex rgba(255, 255, 255, 0.508), inset .25ex .25ex .25ex rgba(0, 0, 0, 0.508);
+}
