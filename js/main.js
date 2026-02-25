@@ -1,5 +1,5 @@
 // This constant sets the number of tasks per trial. You can change it while you are experimenting, but it should be set back to 10 for the actual Bakeoff.
-var tasksLength = 3;
+var tasksLength = 10;
 // constants relating to the number of squares and the size of the canvas are defined in the framework, so you can refer to these (but should not change their values):
 // canvasSize is the size in pixels of the biggest area of screen you may use (regardless of whether you are using the Canvas itself, an SVG, or a div.)
 // As in HW4, it never hurts to put any code that requires access to page elements inside the handler for the load event.
@@ -7,11 +7,37 @@ window.addEventListener("load", function (e) {
     // =========== This part is required: =========== 
     // Initialize the "judge" object with the number of tasks per trial and your team name. 
     // The third parameter sets the trial engine in "verbose" mode or not -- if it is set to "true", all the events will be logged to the Console. (You may wish to set it to "false" if you find these logs overwhelming.)
-    var trial = new Trial(tasksLength, "Team4", true);
+    var trial = new Trial(tasksLength, "Team4", false);
     // =========== /end required =========== 
     // You *may* add listeners to the handful of provided Trial events: "newTask", "start", "testOver", "wrongSquare", "correctSquare", "stop" (but this will probably mostly be useful for debugging).
     trial.addEventListener("start", function () {
         console.log("starting!");
+    });
+    // Create a report for the trial
+    trial.addEventListener("stop", function () {
+        // This is the total number of clicks happened during the testing
+        // it is just all correct clicks + all wrong clicks
+        var total_click = trial.wrongClicks + tasksLength;
+        // The penalty caused by wrong clicks by given formula in the bakeoff
+        var penalty = 0.1 * trial.wrongClicks;
+        // Total time elapsed in ms. This is just summing all splits together
+        var time_elapsed = trial.splits.reduce(function (a, b) {
+            return a + b;
+        }, 0);
+        // Printing the report
+        console.log("\n==========Trial Summary===========\n" +
+            "---------------Clicks-------------\n" +
+            "Number of Rounds: " + tasksLength + "\n" +
+            "Total clicks: " + total_click + "\n" +
+            "Wrong clicks: " + trial.wrongClicks + "\n" +
+            "Accuracy: " + (tasksLength / total_click) * 100 + "%\n" +
+            "Penalty: " + penalty + "ms\n" +
+            "---------------Time---------------\n" +
+            "Total time elapsed: " + time_elapsed + "ms\n" +
+            "Average time per correct click: " + time_elapsed / tasksLength + "ms\n" +
+            "------------Final Score-----------\n" +
+            time_elapsed + penalty);
+        trial.wrongClicks = 0;
     });
     // =========== This part is required: =========== 
     // Draw your clickable squares/buttons somehow. Your elements should, when clicked, invoke the trial.submitClick method, with their numerical ID as the argument: if I click button 1, it should call `trial.submitClick(1)` 

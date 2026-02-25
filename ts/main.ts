@@ -1,5 +1,5 @@
 // This constant sets the number of tasks per trial. You can change it while you are experimenting, but it should be set back to 10 for the actual Bakeoff.
-const tasksLength = 3;
+const tasksLength = 10;
 
 // constants relating to the number of squares and the size of the canvas are defined in the framework, so you can refer to these (but should not change their values):
 // canvasSize is the size in pixels of the biggest area of screen you may use (regardless of whether you are using the Canvas itself, an SVG, or a div.)
@@ -10,13 +10,44 @@ window.addEventListener("load", (e: Event) => {
 	// =========== This part is required: =========== 
 	// Initialize the "judge" object with the number of tasks per trial and your team name. 
 	// The third parameter sets the trial engine in "verbose" mode or not -- if it is set to "true", all the events will be logged to the Console. (You may wish to set it to "false" if you find these logs overwhelming.)
-	const trial = new Trial(tasksLength, "Team4", true);
+	const trial = new Trial(tasksLength, "Team4", false);
 	// =========== /end required =========== 
 	
 
 	// You *may* add listeners to the handful of provided Trial events: "newTask", "start", "testOver", "wrongSquare", "correctSquare", "stop" (but this will probably mostly be useful for debugging).
 	trial.addEventListener("start", () => {
 		console.log("starting!");
+	});
+
+	// Create a report for the trial
+	trial.addEventListener("stop", () => {
+		// This is the total number of clicks happened during the testing
+		// it is just all correct clicks + all wrong clicks
+		let total_click : number = trial.wrongClicks + tasksLength;
+
+		// The penalty caused by wrong clicks by given formula in the bakeoff
+		let penalty : number = 0.1 * trial.wrongClicks;
+
+		// Total time elapsed in ms. This is just summing all splits together
+		let time_elapsed = trial.splits.reduce((a : number, b : number) : number => {
+			return a + b;
+		}, 0);
+
+		// Printing the report
+		console.log("\n==========Trial Summary===========\n"+
+					"---------------Clicks-------------\n"+
+					"Number of Rounds: " + tasksLength + "\n"+
+					"Total clicks: " + total_click + "\n"+
+					"Wrong clicks: " + trial.wrongClicks +"\n"+
+					"Accuracy: " + (tasksLength / total_click)*100 + "%\n"+
+					"Penalty: " + penalty + "ms\n"+
+					"---------------Time---------------\n"+
+					"Total time elapsed: " + time_elapsed + "ms\n"+
+					"Average time per correct click: " + time_elapsed/tasksLength + "ms\n"+
+					"------------Final Score-----------\n"+
+					time_elapsed + penalty);
+
+		trial.wrongClicks = 0;
 	});
 
 	// =========== This part is required: =========== 
