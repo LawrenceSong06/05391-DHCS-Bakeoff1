@@ -1,5 +1,5 @@
 // This constant sets the number of tasks per trial. You can change it while you are experimenting, but it should be set back to 10 for the actual Bakeoff.
-const tasksLength = 3;
+const tasksLength = 10;
 
 // constants relating to the number of squares and the size of the canvas are defined in the framework, so you can refer to these (but should not change their values):
 // canvasSize is the size in pixels of the biggest area of screen you may use (regardless of whether you are using the Canvas itself, an SVG, or a div.)
@@ -10,13 +10,44 @@ window.addEventListener("load", (e: Event) => {
 	// =========== This part is required: =========== 
 	// Initialize the "judge" object with the number of tasks per trial and your team name. 
 	// The third parameter sets the trial engine in "verbose" mode or not -- if it is set to "true", all the events will be logged to the Console. (You may wish to set it to "false" if you find these logs overwhelming.)
-	const trial = new Trial(tasksLength, "teamName", true);
+	const trial = new Trial(tasksLength, "Team4", false);
 	// =========== /end required =========== 
 	
 
 	// You *may* add listeners to the handful of provided Trial events: "newTask", "start", "testOver", "wrongSquare", "correctSquare", "stop" (but this will probably mostly be useful for debugging).
 	trial.addEventListener("start", () => {
 		console.log("starting!");
+	});
+
+	// Create a report for the trial
+	trial.addEventListener("stop", () => {
+		// This is the total number of clicks happened during the testing
+		// it is just all correct clicks + all wrong clicks
+		let total_click : number = trial.wrongClicks + tasksLength;
+
+		// The penalty caused by wrong clicks by given formula in the bakeoff
+		let penalty : number = 0.1 * trial.wrongClicks;
+
+		// Total time elapsed in ms. This is just summing all splits together
+		let time_elapsed = trial.splits.reduce((a : number, b : number) : number => {
+			return a + b;
+		}, 0);
+
+		// Printing the report
+		console.log("\n==========Trial Summary===========\n"+
+					"---------------Clicks-------------\n"+
+					"Number of Rounds: " + tasksLength + "\n"+
+					"Total clicks: " + total_click + "\n"+
+					"Wrong clicks: " + trial.wrongClicks +"\n"+
+					"Accuracy: " + (tasksLength / total_click)*100 + "%\n"+
+					"Penalty: " + penalty + "ms\n"+
+					"---------------Time---------------\n"+
+					"Total time elapsed: " + time_elapsed + "ms\n"+
+					"Average time per correct click: " + time_elapsed/tasksLength + "ms\n"+
+					"------------Final Score-----------\n"+
+					time_elapsed + penalty);
+
+		trial.wrongClicks = 0;
 	});
 
 	// =========== This part is required: =========== 
@@ -62,11 +93,36 @@ function makeSquaresUsingHTMLButtons(trial: Trial) {
 	// And then, as in HW4, the grid is added as a child of the main element.
 	mainDiv.appendChild(grid);
 
+	// Create a div for displaying messages about whether user clicked the right square or not 
+	let message : HTMLDivElement = document.createElement("div");
+	message.style.width = "240px"; // make sure the width is the same as rows of the buttons
+	message.style.height = "50px";  
+	message.id = "message";
+	// The initial status of message div. All status: waiting, correct, incorrect 
+	// Where correct means the message for correct click on the target is currently displayed
+	// and vice-versa
+	message.className = "waiting"; 
+
+	// The timeout id tracker for restoring message to `waiting` status
+	// This will be used later when buttons are clicked and the message status is changed
+	// (We have to restore the message status when it is changed to correct or incorrect after some time
+	// to enhance feedback)
+	// The defualt value is 0, meaning that there is no timeout set.
+	let restore_message_timeout : number = 0;
+
+	// Add it to the grid
+	grid.appendChild(message);
+
 	// As documented above, the "squares" data object is a 2D array. We'll use nested loops to go over it.
 	// The outer loop goes through the rows...
 	for (let rowNumber=0; rowNumber<squares.length; rowNumber++) {
 		// Create a div to be sub-container for just this row.
 		let row : HTMLDivElement = document.createElement("div");
+
+		// Use flex box to align all buttons to the right (closer to the sidebar)
+        row.style.display = "flex";
+        row.style.flexDirection = "row";
+        row.style.justifyContent = "flex-end";
 		
 		// ...and the inner loop goes through the squares in a row.
 		for (let columnNumber=0; columnNumber<squares[rowNumber].length; columnNumber++) {
@@ -81,13 +137,13 @@ function makeSquaresUsingHTMLButtons(trial: Trial) {
 			// Add the square's ID as the text of the button
 			button.innerText = ""+squareID; // the empty string ("") is added to the squareID to convert it from a number (as it is stored in the squareData) to a string (which is what is needed for an innerText property). This is not strictly necessary in plain JavaScript -- JS will do the conversion implicitly -- but TypeScript does care, and I find it helpful to my own understanding/debugging to be careful about this kind of thing.
 
-			button.style.fontSize = "50px"; // make the text bigger, so it's easier to read on the buttons (adjusting for larger button size)
+			button.style.fontSize = "30px"; // make the text bigger, so it's easier to read on the buttons (adjusting for larger button size)
 
 			// style the button to have the square's color as its background color.
 			button.style.background = squareColor;
 
-			button.style.width = "165px"; // set the button to a standard width and height, for a more standardized game experience.
-			button.style.height = "165px";
+			button.style.width = "50px"; // set the button to a standard width and height, for a more standardized game experience.
+			button.style.height = "50px";
 
 			button.style.margin = "5px"; // add some space between the buttons, so they don't look like one big mass of color.
 			row.style.display = "flex"; // this makes the buttons in this row line up horizontally instead of vertically.x
@@ -97,7 +153,36 @@ function makeSquaresUsingHTMLButtons(trial: Trial) {
 				// Depending on your programming background (which language[s] you are more familiar with), you may be suspicious about using the "squareID" variable in this click handler function, since you may have noticed that it is only declared within this inner loop and its value will be different each time through the loop.
 				// However, *will* work in JS, using a language feature called a "closure": because the variable exists with a value at the time that the function is defined (right here, within this instance of the per-square loop), it will continuing existing within that function even if alternate-universe versions of it are created the other times through the loop. MDN's explanation (https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Closures) is a little long/confusing IMO but here's a tiktok: https://www.tiktok.com/@snack.js/video/7606405733172694292
 				// P.S. One of the "subtle differences between var and let" that I mentioned in class is how they work with closures -- see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Closures#creating_closures_in_loops_a_common_mistake for details.
+				
+				// HACKING the framework lol
+				// This value is the number of wrong clicks before current click
+				// It will be used to compare to the number of wrong clicks after current click
+				// If it increased, then we have a wrong click! Otherwise, it is correct
+				// We can then set the message using this information
+				let wrongClicks_before : number = trial.wrongClicks;
 				trial.submitClick(squareID);
+
+				// The boolean value for correctness of the click
+				// This will be used soon after for modifying the class of massage div
+				let correct : boolean = trial.wrongClicks > wrongClicks_before
+
+				// Change the status of message based on correctness of the click
+				// CSS is used to controll the message content and background,
+				// so we do not have to worry about those here
+				if(correct){
+					message.className = "incorrect";
+				}else{
+					message.className = "correct";
+				}
+
+				// Restore waiting status after 1 second
+				// If there is a current timeout counting down, reset it so that
+				// the message will not frequently flash 
+				// (which will probably be considered buggy and might confuse the users)
+				clearTimeout(restore_message_timeout);
+				restore_message_timeout = setTimeout(function(){
+					message.className = "waiting";
+				}, 1000);
 			});
 
 			// then, add this button to the row

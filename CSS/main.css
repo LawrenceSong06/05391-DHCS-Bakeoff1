@@ -1,0 +1,66 @@
+/*Any student-written CSS should go in this file.*/
+.hover-light{
+    transition: box-shadow 100ms;
+}
+.hover-light:hover{
+    /* The button "pops out" when hovered on it */
+    box-shadow: inset -.25ex -.25ex .25ex rgba(0, 0, 0, 0.508), 
+                inset .25ex .25ex .25ex rgba(255, 255, 255, 0.508);
+}
+.hover-light:active{
+    /* The button "sinks in" when it is clicked */
+    box-shadow: inset -.25ex -.25ex .25ex rgba(255, 255, 255, 0.508), 
+                inset .25ex .25ex .25ex rgba(0, 0, 0, 0.508);
+}
+
+/* style for the buttons grid */
+/* Align all elements to the center vertically and to the right horizontally to make
+   everythin closer to the sidebar */
+.display{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-end;
+}
+
+/* style for message */
+
+/* General styling */
+#message{
+    font-size: 15px;
+    
+    /* User flex box to vertically center the message text */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+/* Style for message div in `waiting` status */
+/* It should have a grey background with a message "Please click the target" displayed */
+#message.waiting{
+    background-color: rgb(216, 216, 216);
+}
+/* The message text */
+#message.waiting::before{
+    content: "Please click the target";
+}
+
+/* Style for message div in `correct` status */
+/* It should have a green background with a message "Correct!" displayed */
+#message.correct{
+    background-color: rgb(150, 232, 150);
+}
+/* The message text */
+#message.correct::before{
+    content: "✔ Correct!";
+}
+
+/* Style for message div in `incorrect` status */
+/* It should have a red background with a message "Incorrect!" displayed */
+#message.incorrect{
+    background-color: rgb(237, 138, 138);
+}
+/* The message text */
+#message.incorrect::before{
+    content: "❌ Inorrect!";
+}
