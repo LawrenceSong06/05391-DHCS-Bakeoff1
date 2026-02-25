@@ -47,6 +47,7 @@ window.addEventListener("load", (e: Event) => {
 					"------------Final Score-----------\n"+
 					time_elapsed + penalty);
 
+		// Reset wrongClicks (there is no reset)
 		trial.wrongClicks = 0;
 	});
 
@@ -95,7 +96,7 @@ function makeSquaresUsingHTMLButtons(trial: Trial) {
 
 	// Create a div for displaying messages about whether user clicked the right square or not 
 	let message : HTMLDivElement = document.createElement("div");
-	message.style.width = "240px"; // make sure the width is the same as rows of the buttons
+	message.style.width = "100%"; // make sure the width is the same as rows of the buttons
 	message.style.height = "50px";  
 	message.id = "message";
 	// The initial status of message div. All status: waiting, correct, incorrect 
@@ -132,18 +133,19 @@ function makeSquaresUsingHTMLButtons(trial: Trial) {
 
 			// Make a button element
 			let button : HTMLButtonElement = document.createElement("button");
-			button.classList.add("hover-light");
+			button.classList.add("square");
 
 			// Add the square's ID as the text of the button
 			button.innerText = ""+squareID; // the empty string ("") is added to the squareID to convert it from a number (as it is stored in the squareData) to a string (which is what is needed for an innerText property). This is not strictly necessary in plain JavaScript -- JS will do the conversion implicitly -- but TypeScript does care, and I find it helpful to my own understanding/debugging to be careful about this kind of thing.
 
-			button.style.fontSize = "30px"; // make the text bigger, so it's easier to read on the buttons (adjusting for larger button size)
+			button.style.fontSize = "50px"; // make the text bigger, so it's easier to read on the buttons (adjusting for larger button size)
 
-			// style the button to have the square's color as its background color.
+			// style the button to have the square's color as its background color. Helps the user recognize it from the indicator grid.
 			button.style.background = squareColor;
 
-			button.style.width = "50px"; // set the button to a standard width and height, for a more standardized game experience.
-			button.style.height = "50px";
+			button.style.width = "120px"; // set the button to a standard width and height, for a more standardized game experience.
+			button.style.height = "120px";
+			button.style.cursor = "pointer";
 
 			button.style.margin = "5px"; // add some space between the buttons, so they don't look like one big mass of color.
 			row.style.display = "flex"; // this makes the buttons in this row line up horizontally instead of vertically.x

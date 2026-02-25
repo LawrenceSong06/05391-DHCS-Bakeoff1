@@ -1,17 +1,25 @@
 /*Any student-written CSS should go in this file.*/
-.hover-light{
-    transition: box-shadow 100ms;
+
+/* Hover effects for the squares */
+.square{
+    transition: box-shadow 50ms,
+                transform 50ms linear;
+    transform-origin: center center;
 }
-.hover-light:hover{
+.square:hover{
     /* The button "pops out" when hovered on it */
     box-shadow: inset -.25ex -.25ex .25ex rgba(0, 0, 0, 0.508), 
                 inset .25ex .25ex .25ex rgba(255, 255, 255, 0.508);
+    transform: scale(1.08);
+    z-index: 10;
 }
-.hover-light:active{
+.square:active{
     /* The button "sinks in" when it is clicked */
     box-shadow: inset -.25ex -.25ex .25ex rgba(255, 255, 255, 0.508), 
                 inset .25ex .25ex .25ex rgba(0, 0, 0, 0.508);
+    transform: scale(0.98);
 }
+
 
 /* style for the buttons grid */
 /* Align all elements to the center vertically and to the right horizontally to make
@@ -27,7 +35,7 @@
 
 /* General styling */
 #message{
-    font-size: 15px;
+    font-size: 30px;
     
     /* User flex box to vertically center the message text */
     display: flex;
