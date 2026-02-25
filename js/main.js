@@ -44,11 +44,32 @@ function makeSquaresUsingHTMLButtons(trial) {
     grid.style.height = canvasSize + "px";
     // And then, as in HW4, the grid is added as a child of the main element.
     mainDiv.appendChild(grid);
+    // Create a div for displaying messages about whether user clicked the right square or not 
+    var message = document.createElement("div");
+    message.style.width = "240px"; // make sure the width is the same as rows of the buttons
+    message.style.height = "50px";
+    message.id = "message";
+    // The initial status of message div. All status: waiting, correct, incorrect 
+    // Where correct means the message for correct click on the target is currently displayed
+    // and vice-versa
+    message.className = "waiting";
+    // The timeout id tracker for restoring message to `waiting` status
+    // This will be used later when buttons are clicked and the message status is changed
+    // (We have to restore the message status when it is changed to correct or incorrect after some time
+    // to enhance feedback)
+    // The defualt value is 0, meaning that there is no timeout set.
+    var restore_message_timeout = 0;
+    // Add it to the grid
+    grid.appendChild(message);
     // As documented above, the "squares" data object is a 2D array. We'll use nested loops to go over it.
     // The outer loop goes through the rows...
     for (var rowNumber = 0; rowNumber < squares.length; rowNumber++) {
         // Create a div to be sub-container for just this row.
         var row = document.createElement("div");
+        // Use flex box to align all buttons to the right (closer to the sidebar)
+        row.style.display = "flex";
+        row.style.flexDirection = "row";
+        row.style.justifyContent = "flex-end";
         var _loop_1 = function (columnNumber) {
             // get the id and color data for this square
             var squareID = squares[rowNumber][columnNumber].id;
@@ -58,11 +79,11 @@ function makeSquaresUsingHTMLButtons(trial) {
             button.classList.add("hover-light");
             // Add the square's ID as the text of the button
             button.innerText = "" + squareID; // the empty string ("") is added to the squareID to convert it from a number (as it is stored in the squareData) to a string (which is what is needed for an innerText property). This is not strictly necessary in plain JavaScript -- JS will do the conversion implicitly -- but TypeScript does care, and I find it helpful to my own understanding/debugging to be careful about this kind of thing.
-            button.style.fontSize = "50px"; // make the text bigger, so it's easier to read on the buttons (adjusting for larger button size)
+            button.style.fontSize = "30px"; // make the text bigger, so it's easier to read on the buttons (adjusting for larger button size)
             // style the button to have the square's color as its background color.
             button.style.background = squareColor;
-            button.style.width = "165px"; // set the button to a standard width and height, for a more standardized game experience.
-            button.style.height = "165px";
+            button.style.width = "50px"; // set the button to a standard width and height, for a more standardized game experience.
+            button.style.height = "50px";
             button.style.margin = "5px"; // add some space between the buttons, so they don't look like one big mass of color.
             row.style.display = "flex"; // this makes the buttons in this row line up horizontally instead of vertically.x
             // Very important: we need to be able to tell the trial engine when this button has been clicked! Since we are making these as their own HTML elements, we can add a click listener to each. The handler will report the click to the trial engine using the trial.submitClick method. The handler function is being defined in-place (anonymously) right in the addEventListener method call.
@@ -70,7 +91,33 @@ function makeSquaresUsingHTMLButtons(trial) {
                 // Depending on your programming background (which language[s] you are more familiar with), you may be suspicious about using the "squareID" variable in this click handler function, since you may have noticed that it is only declared within this inner loop and its value will be different each time through the loop.
                 // However, *will* work in JS, using a language feature called a "closure": because the variable exists with a value at the time that the function is defined (right here, within this instance of the per-square loop), it will continuing existing within that function even if alternate-universe versions of it are created the other times through the loop. MDN's explanation (https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Closures) is a little long/confusing IMO but here's a tiktok: https://www.tiktok.com/@snack.js/video/7606405733172694292
                 // P.S. One of the "subtle differences between var and let" that I mentioned in class is how they work with closures -- see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Closures#creating_closures_in_loops_a_common_mistake for details.
+                // HACKING the framework lol
+                // This value is the number of wrong clicks before current click
+                // It will be used to compare to the number of wrong clicks after current click
+                // If it increased, then we have a wrong click! Otherwise, it is correct
+                // We can then set the message using this information
+                var wrongClicks_before = trial.wrongClicks;
                 trial.submitClick(squareID);
+                // The boolean value for correctness of the click
+                // This will be used soon after for modifying the class of massage div
+                var correct = trial.wrongClicks > wrongClicks_before;
+                // Change the status of message based on correctness of the click
+                // CSS is used to controll the message content and background,
+                // so we do not have to worry about those here
+                if (correct) {
+                    message.className = "incorrect";
+                }
+                else {
+                    message.className = "correct";
+                }
+                // Restore waiting status after 1 second
+                // If there is a current timeout counting down, reset it so that
+                // the message will not frequently flash 
+                // (which will probably be considered buggy and might confuse the users)
+                clearTimeout(restore_message_timeout);
+                restore_message_timeout = setTimeout(function () {
+                    message.className = "waiting";
+                }, 1000);
             });
             // then, add this button to the row
             row.appendChild(button);
