@@ -66,5 +66,5 @@
 }
 /* The message text */
 #message.incorrect::before{
-    content: "❌ Inorrect!";
+    content: "❌ Incorrect!";
 }
