@@ -1,16 +1,22 @@
 /*Any student-written CSS should go in this file.*/
-.hover-light{
-    transition: box-shadow 100ms;
+
+/* Hover effects for the squares */
+.square{
+    transition: box-shadow 50ms linear,
+                transform 50ms linear;
+    transform-origin: center center;
 }
-.hover-light:hover{
+.square:hover{
     /* The button "pops out" when hovered on it */
-    box-shadow: inset -.25ex -.25ex .25ex rgba(0, 0, 0, 0.508), 
-                inset .25ex .25ex .25ex rgba(255, 255, 255, 0.508);
+    box-shadow: inset -.25ex -.25ex .05ex rgba(0, 0, 0, 0.4), 
+                inset .25ex .25ex .05ex rgba(255, 255, 255, 0.4);
+    transform: scale(1.10);
+    z-index: 10;
 }
-.hover-light:active{
+.square:active{
     /* The button "sinks in" when it is clicked */
-    box-shadow: inset -.25ex -.25ex .25ex rgba(255, 255, 255, 0.508), 
-                inset .25ex .25ex .25ex rgba(0, 0, 0, 0.508);
+    box-shadow: inset -.25ex -.25ex .05ex rgba(255, 255, 255, 0.4), 
+                inset .25ex .25ex .05ex rgba(0, 0, 0, 0.4);
 }
 
 /* style for the buttons grid */
@@ -27,8 +33,6 @@
 
 /* General styling */
 #message{
-    font-size: 15px;
-    
     /* User flex box to vertically center the message text */
     display: flex;
     flex-direction: column;
@@ -52,7 +56,7 @@
 }
 /* The message text */
 #message.correct::before{
-    content: "✔ Correct!";
+    content: "✅ Correct!";
 }
 
 /* Style for message div in `incorrect` status */
