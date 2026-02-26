@@ -44,7 +44,7 @@ window.addEventListener("load", (e: Event) => {
 					"Total time elapsed: " + time_elapsed + "s\n"+
 					"Average time per correct click: " + time_elapsed/tasksLength + "ms\n"+
 					"------------Final Score-----------\n"+
-					time_elapsed/1000 + penalty + penalty ? 1 : 0);
+					time_elapsed/1000 + penalty + (penalty ? 1 : 0));
 
 		// Reset wrongClicks (there is no reset)
 		trial.wrongClicks = 0;
@@ -150,7 +150,8 @@ function makeSquaresUsingHTMLButtons(trial: Trial) {
 			button.style.display = "flex";
 			button.style.alignItems = "center";
 			button.style.justifyContent = "center"; // Align all the text to the center
-			button.style.border = "rgb(126, 126, 126) 2px solid";
+			// Make the border neutral grey so that it will not attract too much attention
+			button.style.border = "rgb(126, 126, 126) 2px solid";  
 			// style the button to have the square's color as its background color. Helps the user recognize it from the indicator grid.
 			button.style.background = squareColor;
 
