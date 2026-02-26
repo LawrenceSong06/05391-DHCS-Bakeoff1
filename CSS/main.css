@@ -2,24 +2,22 @@
 
 /* Hover effects for the squares */
 .square{
-    transition: box-shadow 50ms,
+    transition: box-shadow 50ms linear,
                 transform 50ms linear;
     transform-origin: center center;
 }
 .square:hover{
     /* The button "pops out" when hovered on it */
-    box-shadow: inset -.25ex -.25ex .25ex rgba(0, 0, 0, 0.508), 
-                inset .25ex .25ex .25ex rgba(255, 255, 255, 0.508);
-    transform: scale(1.08);
+    box-shadow: inset -.25ex -.25ex .05ex rgba(0, 0, 0, 0.4), 
+                inset .25ex .25ex .05ex rgba(255, 255, 255, 0.4);
+    transform: scale(1.10);
     z-index: 10;
 }
 .square:active{
     /* The button "sinks in" when it is clicked */
-    box-shadow: inset -.25ex -.25ex .25ex rgba(255, 255, 255, 0.508), 
-                inset .25ex .25ex .25ex rgba(0, 0, 0, 0.508);
-    transform: scale(0.98);
+    box-shadow: inset -.25ex -.25ex .05ex rgba(255, 255, 255, 0.4), 
+                inset .25ex .25ex .05ex rgba(0, 0, 0, 0.4);
 }
-
 
 /* style for the buttons grid */
 /* Align all elements to the center vertically and to the right horizontally to make
@@ -35,8 +33,6 @@
 
 /* General styling */
 #message{
-    font-size: 30px;
-    
     /* User flex box to vertically center the message text */
     display: flex;
     flex-direction: column;
@@ -60,7 +56,7 @@
 }
 /* The message text */
 #message.correct::before{
-    content: "✔ Correct!";
+    content: "✅ Correct!";
 }
 
 /* Style for message div in `incorrect` status */

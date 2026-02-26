@@ -49,6 +49,13 @@ window.addEventListener("load", (e: Event) => {
 
 		// Reset wrongClicks (there is no reset)
 		trial.wrongClicks = 0;
+
+		// Recover all faded squares
+		setTimeout(() => {
+			Array.from(document.getElementsByClassName("square")).map((x : HTMLDivElement)=>{
+			x.style.opacity = "1";
+		});
+		}, 0);
 	});
 
 	// =========== This part is required: =========== 
@@ -96,8 +103,9 @@ function makeSquaresUsingHTMLButtons(trial: Trial) {
 
 	// Create a div for displaying messages about whether user clicked the right square or not 
 	let message : HTMLDivElement = document.createElement("div");
-	message.style.width = "100%"; // make sure the width is the same as rows of the buttons
+	message.style.width = "280px"; // make sure the width is the same as rows of the buttons
 	message.style.height = "50px";  
+	message.style.fontSize = "20px";
 	message.id = "message";
 	// The initial status of message div. All status: waiting, correct, incorrect 
 	// Where correct means the message for correct click on the target is currently displayed
@@ -138,16 +146,19 @@ function makeSquaresUsingHTMLButtons(trial: Trial) {
 			// Add the square's ID as the text of the button
 			button.innerText = ""+squareID; // the empty string ("") is added to the squareID to convert it from a number (as it is stored in the squareData) to a string (which is what is needed for an innerText property). This is not strictly necessary in plain JavaScript -- JS will do the conversion implicitly -- but TypeScript does care, and I find it helpful to my own understanding/debugging to be careful about this kind of thing.
 
-			button.style.fontSize = "50px"; // make the text bigger, so it's easier to read on the buttons (adjusting for larger button size)
-
+			button.style.fontSize = "35px"; // make the text bigger, so it's easier to read on the buttons (adjusting for larger button size)
+			button.style.display = "flex";
+			button.style.alignItems = "center";
+			button.style.justifyContent = "center"; // Align all the text to the center
+			button.style.border = "rgb(126, 126, 126) 2px solid";
 			// style the button to have the square's color as its background color. Helps the user recognize it from the indicator grid.
 			button.style.background = squareColor;
 
-			button.style.width = "120px"; // set the button to a standard width and height, for a more standardized game experience.
-			button.style.height = "120px";
-			button.style.cursor = "pointer";
+			button.style.width = "65px"; // set the button to a standard width and height, for a more standardized game experience.
+			button.style.height = "65px";
+			button.style.cursor = "pointer"; // set the cursor to pointer to enhance user's perception for mouse location
 
-			button.style.margin = "5px"; // add some space between the buttons, so they don't look like one big mass of color.
+			button.style.margin = "3px"; // add some space between the buttons, so they don't look like one big mass of color.
 			row.style.display = "flex"; // this makes the buttons in this row line up horizontally instead of vertically.x
 
 			// Very important: we need to be able to tell the trial engine when this button has been clicked! Since we are making these as their own HTML elements, we can add a click listener to each. The handler will report the click to the trial engine using the trial.submitClick method. The handler function is being defined in-place (anonymously) right in the addEventListener method call.
@@ -166,14 +177,17 @@ function makeSquaresUsingHTMLButtons(trial: Trial) {
 
 				// The boolean value for correctness of the click
 				// This will be used soon after for modifying the class of massage div
-				let correct : boolean = trial.wrongClicks > wrongClicks_before
+				let incorrect : boolean = trial.wrongClicks > wrongClicks_before
 
 				// Change the status of message based on correctness of the click
 				// CSS is used to controll the message content and background,
 				// so we do not have to worry about those here
-				if(correct){
+				if(incorrect){
 					message.className = "incorrect";
 				}else{
+					// Since each square can only be correctly hit once,
+					// we fade it after it is clicked.
+					button.style.opacity = ".3";
 					message.className = "correct";
 				}
 
