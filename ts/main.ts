@@ -12,7 +12,6 @@ window.addEventListener("load", (e: Event) => {
 	// The third parameter sets the trial engine in "verbose" mode or not -- if it is set to "true", all the events will be logged to the Console. (You may wish to set it to "false" if you find these logs overwhelming.)
 	const trial = new Trial(tasksLength, "Team4", false);
 	// =========== /end required =========== 
-	
 
 	// You *may* add listeners to the handful of provided Trial events: "newTask", "start", "testOver", "wrongSquare", "correctSquare", "stop" (but this will probably mostly be useful for debugging).
 	trial.addEventListener("start", () => {
@@ -42,18 +41,19 @@ window.addEventListener("load", (e: Event) => {
 					"Accuracy: " + (tasksLength / total_click)*100 + "%\n"+
 					"Penalty: " + penalty + "ms\n"+
 					"---------------Time---------------\n"+
-					"Total time elapsed: " + time_elapsed + "ms\n"+
+					"Total time elapsed: " + time_elapsed + "s\n"+
 					"Average time per correct click: " + time_elapsed/tasksLength + "ms\n"+
 					"------------Final Score-----------\n"+
-					time_elapsed + penalty);
+					time_elapsed/1000 + penalty + penalty ? 1 : 0);
 
 		// Reset wrongClicks (there is no reset)
 		trial.wrongClicks = 0;
 
-		// Recover all faded squares
+		// Recover all greyed out squares
 		setTimeout(() => {
-			Array.from(document.getElementsByClassName("square")).map((x : HTMLDivElement)=>{
-			x.style.opacity = "1";
+			Array.from(document.getElementsByClassName("square")).map((button : HTMLButtonElement)=>{
+			button.style.opacity = "1";
+			button.style.pointerEvents = "initial";
 		});
 		}, 0);
 	});
@@ -138,7 +138,7 @@ function makeSquaresUsingHTMLButtons(trial: Trial) {
 			// get the id and color data for this square
 			let squareID : number = squares[rowNumber][columnNumber].id;
 			let squareColor : string = squares[rowNumber][columnNumber].color;
-
+			
 			// Make a button element
 			let button : HTMLButtonElement = document.createElement("button");
 			button.classList.add("square");
@@ -186,8 +186,9 @@ function makeSquaresUsingHTMLButtons(trial: Trial) {
 					message.className = "incorrect";
 				}else{
 					// Since each square can only be correctly hit once,
-					// we fade it after it is clicked.
+					// we grey it out after it is clicked. (Also, it cannot be clicked anymore)
 					button.style.opacity = ".3";
+					button.style.pointerEvents = "none";
 					message.className = "correct";
 				}
 

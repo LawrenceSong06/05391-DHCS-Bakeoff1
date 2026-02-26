@@ -33,16 +33,17 @@ window.addEventListener("load", function (e) {
             "Accuracy: " + (tasksLength / total_click) * 100 + "%\n" +
             "Penalty: " + penalty + "ms\n" +
             "---------------Time---------------\n" +
-            "Total time elapsed: " + time_elapsed + "ms\n" +
+            "Total time elapsed: " + time_elapsed + "s\n" +
             "Average time per correct click: " + time_elapsed / tasksLength + "ms\n" +
             "------------Final Score-----------\n" +
-            time_elapsed + penalty);
+            time_elapsed / 1000 + penalty + penalty ? 1 : 0);
         // Reset wrongClicks (there is no reset)
         trial.wrongClicks = 0;
-        // Recover all faded squares
+        // Recover all greyed out squares
         setTimeout(function () {
-            Array.from(document.getElementsByClassName("square")).map(function (x) {
-                x.style.opacity = "1";
+            Array.from(document.getElementsByClassName("square")).map(function (button) {
+                button.style.opacity = "1";
+                button.style.pointerEvents = "initial";
             });
         }, 0);
     });
@@ -148,8 +149,9 @@ function makeSquaresUsingHTMLButtons(trial) {
                 }
                 else {
                     // Since each square can only be correctly hit once,
-                    // we fade it after it is clicked.
+                    // we grey it out after it is clicked. (Also, it cannot be clicked anymore)
                     button.style.opacity = ".3";
+                    button.style.pointerEvents = "none";
                     message.className = "correct";
                 }
                 // Restore waiting status after 1 second
